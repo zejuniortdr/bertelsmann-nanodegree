@@ -29,18 +29,18 @@ Now we need to know how the length of rental duration of these family-friendly m
 
 ```sql
 SELECT
-	f.title AS film_title,
+    f.title AS film_title,
     c.name AS category_name,
     rental_duration,
     NTILE(4) OVER(ORDER BY sum(rental_duration)) AS standard_quartile
 FROM 
 	film f
-    	JOIN film_category fc ON fc.film_id = f.film_id
-   		JOIN category c ON c.category_id = fc.category_id
+        JOIN film_category fc ON fc.film_id = f.film_id
+        JOIN category c ON c.category_id = fc.category_id
         JOIN inventory i ON i.film_id = f.film_id
         JOIN rental r ON r.inventory_id = i.inventory_id
 WHERE
-	c.name IN ('Animation', 'Children', 'Classics', 'Comedy', 'Family', 'Music')
+    c.name IN ('Animation', 'Children', 'Classics', 'Comedy', 'Family', 'Music')
 GROUP BY 1, 2, 3
 ORDER BY 4, 3
 ```
