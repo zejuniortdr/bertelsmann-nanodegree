@@ -58,7 +58,7 @@ WITH temp_table AS (
         f.title AS film_title,
         c.name AS category_name,
         rental_duration,
-        NTILE(4) OVER(ORDER BY sum(rental_duration)) AS standard_quartile
+        NTILE(4) OVER(ORDER BY rental_duration) AS standard_quartile
     FROM 
         film f
             JOIN film_category fc ON fc.film_id = f.film_id
@@ -74,7 +74,8 @@ SELECT
     category_name, 
     standard_quartile,
     COUNT(*) AS count
-FROM temp_table
+FROM 
+    temp_table
 GROUP BY 1, 2
 ORDER BY 1, 2
 ```
