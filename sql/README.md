@@ -20,6 +20,7 @@ FROM
 WHERE
     c.name IN ('Animation', 'Children', 'Classics', 'Comedy', 'Family', 'Music')
 GROUP BY 1, 2
+ORDER BY 2, 1
 ```
 
 
@@ -27,21 +28,24 @@ GROUP BY 1, 2
 Now we need to know how the length of rental duration of these family-friendly movies compares to the duration that all movies are rented for. Can you provide a table with the movie titles and divide them into 4 levels (first_quarter, second_quarter, third_quarter, and final_quarter) based on the quartiles (25%, 50%, 75%) of the rental duration for movies across all categories? Make sure to also indicate the category that these family-friendly movies fall into.
 
 ```sql
+WITH films_category_quartiles AS(
 SELECT
     f.title AS film_title,
     c.name AS category_name,
     rental_duration,
-    NTILE(4) OVER(ORDER BY sum(rental_duration)) AS standard_quartile
+    NTILE(4) OVER(ORDER BY rental_duration) AS standard_quartile
 FROM 
     film f
         JOIN film_category fc ON fc.film_id = f.film_id
         JOIN category c ON c.category_id = fc.category_id
         JOIN inventory i ON i.film_id = f.film_id
-        JOIN rental r ON r.inventory_id = i.inventory_id
-WHERE
-    c.name IN ('Animation', 'Children', 'Classics', 'Comedy', 'Family', 'Music')
 GROUP BY 1, 2, 3
-ORDER BY 4, 3
+)
+SELECT * 
+FROM films_category_quartiles
+WHERE
+    category_name IN ('Animation', 'Children', 'Classics', 'Comedy', 'Family', 'Music')
+ORDER BY 4, 3, 1
 ```
 
 ## Question 3
@@ -90,7 +94,7 @@ SELECT
     EXTRACT(MONTH FROM rental_date) AS rental_month,
     EXTRACT(YEAR FROM rental_date) AS rental_year,
     store.store_id AS store_id,
-    count(*) AS count_rentals
+    COUNT(*) AS count_rentals
 FROM 
 	store
     	JOIN staff ON staff.store_id = store.store_id
@@ -115,9 +119,9 @@ WITH top10 AS (
 ) 
 SELECT 
     DATE_TRUNC('month', payment_date) AS pay_mon,
-    concat(c.first_name, ' ', c.last_name) AS full_name,
-    count(*) AS pay_countpermon,
-    sum(amount) AS pay_amount
+    CONCAT(c.first_name, ' ', c.last_name) AS full_name,
+    COUNT(*) AS pay_countpermon,
+    SUM(amount) AS pay_amount
 FROM payment p
     JOIN top10 ON top10.customer_id = p.customer_id AND EXTRACT(YEAR FROM payment_date) = 2007
     JOIN customer c ON c.customer_id = p.customer_id
