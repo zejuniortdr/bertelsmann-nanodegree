@@ -34,7 +34,7 @@ SELECT
     rental_duration,
     NTILE(4) OVER(ORDER BY sum(rental_duration)) AS standard_quartile
 FROM 
-	film f
+    film f
         JOIN film_category fc ON fc.film_id = f.film_id
         JOIN category c ON c.category_id = fc.category_id
         JOIN inventory i ON i.film_id = f.film_id
