@@ -1,5 +1,4 @@
-# Queryset 1
-
+# QUESTION SET 1
 
 ## Question 1
 
@@ -78,4 +77,24 @@ FROM
     temp_table
 GROUP BY 1, 2
 ORDER BY 1, 2
+```
+
+# QUESTION SET 2
+
+## Question 1
+Question 1:
+We want to find out how the two stores compare in their count of rental orders during every month for all the years we have data for. Write a query that returns the store ID for the store, the year and month and the number of rental orders each store has fulfilled for that month. Your table should include a column for each of the following: year, month, store ID and count of rental orders fulfilled during that month.
+
+```sql
+SELECT 
+	EXTRACT(MONTH FROM rental_date) AS rental_month,
+    EXTRACT(YEAR FROM rental_date) AS rental_year,
+    store.store_id AS store_id,
+    count(*) AS count_rentals
+FROM 
+	store
+    	JOIN staff ON staff.store_id = store.store_id
+        JOIN rental ON rental.staff_id = staff.staff_id
+GROUP BY 1, 2, 3
+ORDER BY 2, 1 ASC, 4 DESC
 ```
