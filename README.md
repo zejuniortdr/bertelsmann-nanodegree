@@ -44,3 +44,37 @@ WHERE
 GROUP BY 1, 2, 3
 ORDER BY 4, 3
 ```
+
+## Question 3
+Finally, provide a table with the family-friendly film category, each of the quartiles, and the corresponding count of movies within each combination of film category for each corresponding rental duration category. The resulting table should have three columns:
+
+- Category
+- Rental length category
+- Count
+
+```sql
+WITH temp_table AS (
+    SELECT
+        f.title AS film_title,
+        c.name AS category_name,
+        rental_duration,
+        NTILE(4) OVER(ORDER BY sum(rental_duration)) AS standard_quartile
+    FROM 
+        film f
+            JOIN film_category fc ON fc.film_id = f.film_id
+            JOIN category c ON c.category_id = fc.category_id
+            JOIN inventory i ON i.film_id = f.film_id
+            JOIN rental r ON r.inventory_id = i.inventory_id
+    WHERE
+        c.name IN ('Animation', 'Children', 'Classics', 'Comedy', 'Family', 'Music')
+    GROUP BY 1, 2, 3
+    ORDER BY 2
+)
+SELECT 
+    category_name, 
+    standard_quartile,
+    COUNT(*) AS count
+FROM temp_table
+GROUP BY 1, 2
+ORDER BY 1, 2
+```
