@@ -87,7 +87,7 @@ We want to find out how the two stores compare in their count of rental orders d
 
 ```sql
 SELECT 
-	EXTRACT(MONTH FROM rental_date) AS rental_month,
+    EXTRACT(MONTH FROM rental_date) AS rental_month,
     EXTRACT(YEAR FROM rental_date) AS rental_year,
     store.store_id AS store_id,
     count(*) AS count_rentals
