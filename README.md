@@ -98,3 +98,29 @@ FROM
 GROUP BY 1, 2, 3
 ORDER BY 2, 1 ASC, 4 DESC
 ```
+
+## Question 2
+Question 2
+We would like to know who were our top 10 paying customers, how many payments they made on a monthly basis during 2007, and what was the amount of the monthly payments. Can you write a query to capture the customer name, month and year of payment, and total payment amount for each month by these top 10 paying customers?
+
+```sql
+WITH top10 AS (
+    SELECT 
+        customer_id,
+        sum(amount)
+    FROM payment
+    GROUP BY 1
+    ORDER BY 2 DESC
+    LIMIT 10
+) 
+SELECT 
+    DATE_TRUNC('month', payment_date) AS pay_mon,
+    concat(c.first_name, ' ', c.last_name) AS full_name,
+    count(*) AS pay_countpermon,
+    sum(amount) AS pay_amount
+FROM payment p
+    JOIN top10 ON top10.customer_id = p.customer_id AND EXTRACT(YEAR FROM payment_date) = 2007
+    JOIN customer c ON c.customer_id = p.customer_id
+GROUP BY 1, 2
+ORDER BY 2
+```
