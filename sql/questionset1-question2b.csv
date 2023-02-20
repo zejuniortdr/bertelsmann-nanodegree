@@ -1,0 +1,43 @@
+day_of_week,category_name,total_rentals
+Tuesday  ,Animation,200
+Saturday ,Family,178
+Wednesday,Animation,173
+Tuesday  ,Family,173
+Sunday   ,Family,167
+Saturday ,Animation,166
+Friday   ,Animation,163
+Monday   ,Animation,158
+Sunday   ,Children,158
+Sunday   ,Animation,156
+Friday   ,Children,155
+Tuesday  ,Classics,155
+Monday   ,Family,154
+Monday   ,Comedy,153
+Tuesday  ,Comedy,152
+Wednesday,Family,151
+Thursday ,Animation,150
+Friday   ,Classics,149
+Thursday ,Family,139
+Saturday ,Classics,138
+Friday   ,Comedy,138
+Tuesday  ,Children,138
+Thursday ,Comedy,135
+Monday   ,Classics,135
+Friday   ,Family,134
+Saturday ,Children,133
+Sunday   ,Classics,132
+Wednesday,Music,130
+Friday   ,Music,129
+Tuesday  ,Music,127
+Saturday ,Comedy,127
+Wednesday,Children,123
+Monday   ,Children,122
+Sunday   ,Comedy,121
+Thursday ,Classics,120
+Thursday ,Music,117
+Saturday ,Music,117
+Thursday ,Children,116
+Wednesday,Comedy,115
+Sunday   ,Music,113
+Wednesday,Classics,110
+Monday   ,Music,97
