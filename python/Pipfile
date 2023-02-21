@@ -8,6 +8,9 @@ numpy = "*"
 jupyter = "*"
 ipython = "*"
 pandas = "*"
+black = "*"
+flake8 = "*"
+pre-commit = "*"
 
 [dev-packages]
 
