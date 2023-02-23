@@ -226,9 +226,9 @@ def user_stats(df):
     print(f"Empty:     {empty}")
 
     # Display earliest, most recent, and most common year of birth
-    df_erliest_year = int(df["Birth Year"].min())
-    df_recent_year = int(df["Birth Year"].max())
-    df_mode_year = int(df["Birth Year"].mode())
+    df_erliest_year = df["Birth Year"].min()
+    df_recent_year = df["Birth Year"].max()
+    df_mode_year = df["Birth Year"].mode()
 
     print(f"\nThe most erliest year of birth: {df_erliest_year}")
     print(f"The most recent year of birth: {df_recent_year}")
@@ -250,12 +250,17 @@ def main():
                 city, month, day = k, k2, d
                 
                 df = load_data(city, month, day)
-
-                time_stats(df)
-                station_stats(df)
-                trip_duration_stats(df)
-                user_stats(df)
                 
+                try:
+                    time_stats(df)
+                    station_stats(df)
+                    trip_duration_stats(df)
+                    user_stats(df)
+                except:
+                    print("#"*50)
+                    print("Error")
+                    print(city, month, day)
+                    print("#"*50)
 
                 print(f"\nTotal time in seconds: {time.time() - start_time}")
                 # restart = input("\nWould you like to restart? Enter yes or no.\n")
