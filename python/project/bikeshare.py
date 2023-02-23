@@ -254,7 +254,7 @@ def user_stats(df):
         print()
         print(df_gender.to_string())
         empty = len(df) - sum(df_gender.values.tolist())
-        print(f"Empty:     {empty}")
+        print(f"Empty {empty}")
     except KeyError:
         # Some cities do not have gender
         pass
@@ -308,8 +308,8 @@ def header(city, month, day):
 def main():
     while True:
         try:
-            # city, month, day = get_filters()
-            city, month, day = "chicago", "all", "all"
+            city, month, day = get_filters()
+            # city, month, day = "chicago", "all", "all"
         except KeyboardInterrupt:
             break
 
