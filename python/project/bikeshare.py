@@ -30,6 +30,16 @@ WEEKDAYS_NAMES = [
 ]
 
 
+def get_most_commum(df):
+    df_most_common = df.value_counts().to_frame()
+    most_common = df_most_common.index.values[0]
+    count = df_most_common.values[0][0]
+    return most_common, count
+
+def get_route(row):
+    return f"FROM: {row['Start Station']} TO: {row['End Station']}"
+
+
 def get_dict_key_name_from_value(input_dict, value):
     """
     Function to get dict key name from a key value
@@ -113,7 +123,7 @@ def load_data(city, month, day):
     df['month'] = df['Start Time'].dt.month 
     df['day_of_week'] = df['Start Time'].dt.day_name()
     df['hour'] = df['Start Time'].dt.hour
-    df['route'] = f"{df['Start Station']} - {df['End Station']}"
+    df['route'] = df.apply(lambda row: get_route(row), axis=1)
 
     if month != "all":
         df = df[df['month'] == MONTHS_NAMES[month]]
@@ -131,26 +141,19 @@ def time_stats(df):
     start_time = time.time()
 
     # display the most common month
-    df_most_common_month = df['month'].value_counts().to_frame()
-    most_common_month = get_dict_key_name_from_value(
-        MONTHS_NAMES, df_most_common_month.index.values[0]
-    )
-    count = df_most_common_month.values[0][0]
-    print(f"The most common month is {most_common_month.title()}. Count: {count}")
+    month, count = get_most_commum(df['month'])
+    month = get_dict_key_name_from_value(MONTHS_NAMES, month)
+    print(f"The most common month is {month.title()}. Count: {count}")
 
     # display the most common day of week
-    df_most_common_day_of_week = df['day_of_week'].value_counts().to_frame()
-    most_common_day_of_week = df_most_common_day_of_week.index.values[0]
-    count = df_most_common_day_of_week.values[0][0]
-    print(f"The most common day of week is {most_common_day_of_week}. Count: {count}")
+    day_of_week, count = get_most_commum(df['day_of_week'])
+    print(f"The most common day of week is {day_of_week}. Count: {count}")
 
     # display the most common start hour
-    df_most_common_hour = df['hour'].value_counts().to_frame()
-    most_common_hour = df_most_common_hour.index.values[0]
-    count = df_most_common_hour.values[0][0]
-    print(f"The most common start hour is {most_common_hour}. Count: {count}")
+    hour, count = get_most_commum(df['hour'])
+    print(f"The most common start hour is {hour}. Count: {count}")
 
-    print("\nThis took %s seconds." % (time.time() - start_time))
+    print(f"\nThis took {time.time() - start_time} seconds.")
     print("-" * 40)
 
 
@@ -161,28 +164,20 @@ def station_stats(df):
     start_time = time.time()
 
     # display most commonly used start station
-    df_most_common_station = df['Start Station'].value_counts().to_frame()
-    most_common_station = df_most_common_station.index.values[0]
-    count = df_most_common_station.values[0][0]
-    print(f"The most commonly used start station is {most_common_station}. Count: {count}")
+    start_station, count = get_most_commum(df['Start Station'])
+    print(f"The most commonly used start station is {start_station}. Count: {count}")
 
     # display most commonly used end station
-    df_most_common_station = df['End Station'].value_counts().to_frame()
-    most_common_station = df_most_common_station.index.values[0]
-    count = df_most_common_station.values[0][0]
-    print(f"The most commonly used end station is {most_common_station}. Count: {count}")
+    end_station, count = get_most_commum(df['End Station'])
+    print(f"The most commonly used end station is {end_station}. Count: {count}")
 
     # display most frequent combination of start station and end station trip
-    # df_most_common_route = df['route'].value_counts().to_frame()
-    # most_common_route = df_most_common_route.index.values[0]
-    # count = df_most_common_route.values[0][0]
-    # print(f"The most common start route is {most_common_route}. Count: {count}")
     # TODO: most frequent combination
-    print("# TODO: most frequent combination of start station and end station trip")
+    route, count = get_most_commum(df['route'])
+    print(f"The most commonly route is {route}. Count: {count}")
 
 
-
-    print("\nThis took %s seconds." % (time.time() - start_time))
+    print(f"\nThis took {time.time() - start_time} seconds.")
     print("-" * 40)
 
 
@@ -200,7 +195,15 @@ def trip_duration_stats(df):
     mean_time_in_seconds = int(df['Trip Duration'].mean())
     print(f"Mean travel time is {mean_time_in_seconds} seconds ({timedelta(seconds=mean_time_in_seconds)})")
 
-    print("\nThis took %s seconds." % (time.time() - start_time))
+    # display max travel time
+    max_time_in_seconds = int(df['Trip Duration'].max())
+    print(f"Max travel time is {max_time_in_seconds} seconds ({timedelta(seconds=max_time_in_seconds)})")
+
+    # display min travel time
+    min_time_in_seconds = int(df['Trip Duration'].min())
+    print(f"Min travel time is {min_time_in_seconds} seconds ({timedelta(seconds=min_time_in_seconds)})")
+    
+    print(f"\nThis took {time.time() - start_time} seconds.")
     print("-" * 40)
 
 
@@ -211,31 +214,58 @@ def user_stats(df):
     start_time = time.time()
 
     # Display counts of user types
+    df_users_types = df.groupby(['User Type'])['User Type'].count()
+    print()
+    print(df_users_types.to_string())
 
     # Display counts of gender
+    df_gender = df.groupby(['Gender'])['Gender'].count()
+    print()
+    print(df_gender.to_string())
+    empty = len(df) - sum(df_gender.values.tolist())
+    print(f"Empty:     {empty}")
 
     # Display earliest, most recent, and most common year of birth
+    df_erliest_year = int(df["Birth Year"].min())
+    df_recent_year = int(df["Birth Year"].max())
+    df_mode_year = int(df["Birth Year"].mode())
 
-    print("\nThis took %s seconds." % (time.time() - start_time))
+    print(f"\nThe most erliest year of birth: {df_erliest_year}")
+    print(f"The most recent year of birth: {df_recent_year}")
+    print(f"The most common year of birth: {df_mode_year}")
+
+    print(f"\nThis took {time.time() - start_time} seconds.")
     print("-" * 40)
 
 
 def main():
-    while True:
-        # city, month, day = get_filters()
-        city, month, day = "chicago", "january", "sunday"
-        
-        df = load_data(city, month, day)
+    # while True:
+    i = 0
+    for k, v in CITY_DATA.items():
+        for k2, _ in MONTHS_NAMES.items():
+            for d in WEEKDAYS_NAMES:
+                start_time = time.time()
+                # city, month, day = get_filters()
+                # city, month, day = "chicago", "january", "monday"
+                city, month, day = k, k2, d
+                
+                df = load_data(city, month, day)
 
-        time_stats(df)
-        station_stats(df)
-        trip_duration_stats(df)
-        # user_stats(df)
+                time_stats(df)
+                station_stats(df)
+                trip_duration_stats(df)
+                user_stats(df)
+                
 
-        restart = input("\nWould you like to restart? Enter yes or no.\n")
-        if restart.lower() != "yes":
-            break
-
+                print(f"\nTotal time in seconds: {time.time() - start_time}")
+                # restart = input("\nWould you like to restart? Enter yes or no.\n")
+                # if restart.lower() != "yes":
+                #     break
+                
+                i += 1
+                print("#"*50)
+                print(i, 126)
+                print("#"*50)
 
 if __name__ == "__main__":
     main()
