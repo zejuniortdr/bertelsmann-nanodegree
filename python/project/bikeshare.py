@@ -116,7 +116,7 @@ def get_filters():
         (str) day - name of the day of week to filter by, or "all" to apply no day filter
     """
     print("Hello! Let's explore some US bikeshare data!")
-    print("If you want to quit, just type 'exit' anytime")
+    print("If you want to quit, just type 'exit' anytime\n\n")
     # get user input for city (chicago, new york city, washington). 
     # HINT: Use a while loop to handle invalid inputs
     city = get_input_data("city", list(CITY_DATA.keys()))
@@ -159,25 +159,28 @@ def load_data(city, month, day):
 
     return df
 
+def format_percent(num, total):
+    return f"{num / total* 100:.2f}%"
 
 def time_stats(df):
     """Displays statistics on the most frequent times of travel."""
 
     print("\nCalculating The Most Frequent Times of Travel...\n")
     start_time = time.time()
+    total_count = len(df)
 
     # display the most common month
     month, count = get_most_commum(df['month'])
     month = get_dict_key_name_from_value(MONTHS_NAMES, month)
-    print(f"The most common month is {month.title()}. Count: {count}")
+    print(f"The most common month is {month.title()}. Count: {count} ({format_percent(count, total_count)})")
 
     # display the most common day of week
     day_of_week, count = get_most_commum(df['day_of_week'])
-    print(f"The most common day of week is {day_of_week}. Count: {count}")
+    print(f"The most common day of week is {day_of_week}. Count: {count} ({format_percent(count, total_count)})")
 
     # display the most common start hour
     hour, count = get_most_commum(df['hour'])
-    print(f"The most common start hour is {hour}. Count: {count}")
+    print(f"The most common start hour is {hour}. Count: {count} ({format_percent(count, total_count)})")
 
     print(f"\nThis took {time.time() - start_time} seconds.")
     print("-" * 40)
@@ -188,19 +191,20 @@ def station_stats(df):
 
     print("\nCalculating The Most Popular Stations and Trip...\n")
     start_time = time.time()
+    total_count = len(df)
 
     # display most commonly used start station
     start_station, count = get_most_commum(df['Start Station'])
-    print(f"The most commonly used start station is {start_station}. Count: {count}")
+    print(f"The most commonly used start station is {start_station}. Count: {count} ({format_percent(count, total_count)})")
 
     # display most commonly used end station
     end_station, count = get_most_commum(df['End Station'])
-    print(f"The most commonly used end station is {end_station}. Count: {count}")
+    print(f"The most commonly used end station is {end_station}. Count: {count} ({format_percent(count, total_count)})")
 
     # display most frequent combination of start station and end station trip
     # TODO: most frequent combination
     route, count = get_most_commum(df['route'])
-    print(f"The most commonly route is {route}. Count: {count}")
+    print(f"The most commonly route is {route}. Count: {count} ({format_percent(count, total_count)})")
 
 
     print(f"\nThis took {time.time() - start_time} seconds.")
@@ -273,7 +277,9 @@ def user_stats(df):
     print("-" * 40)
 
 def menu():
+    """Displays menu to users."""
     print("-" * 40)
+    print("To analise the data, please choose a menu number, or type 9 to restart or 0 to exit")
     print("1 - Time Stats")
     print("2 - Station Stats")
     print("3 - Trip Duration Stats")
@@ -289,11 +295,21 @@ def menu():
     return option
 
 
+def header(city, month, day):
+    """Displays header with the chosen filters to users."""
+    print("\n\n\n")
+    print("="*50)
+    print("Chosen Filters:")
+    print(f"City: {city}")
+    print(f"Month: {month}")
+    print(f"Day of Week: {day}")
+    
+
 def main():
     while True:
         try:
-            city, month, day = get_filters()
-            # city, month, day = "chicago", "all", "all"
+            # city, month, day = get_filters()
+            city, month, day = "chicago", "all", "all"
         except KeyboardInterrupt:
             break
 
@@ -301,25 +317,20 @@ def main():
         
         while True:
             option = int(menu())
+            
+            if 1 <= option <= 4:
+                header(city, month, day)
 
-            try:
-                if option == 1:
-                    time_stats(df)
-                elif option == 2:
-                    station_stats(df)
-                elif option == 3:
-                    trip_duration_stats(df)
-                elif option == 4:
-                    user_stats(df)
-                elif option == 9:
-                    break
-    
-            except Exception as exc:
-                print("#"*50)
-                print(f"Error: {exc}")
-                print(city, month, day)
-                print("#"*50)
-                raise
+            if option == 1:
+                time_stats(df)
+            elif option == 2:
+                station_stats(df)
+            elif option == 3:
+                trip_duration_stats(df)
+            elif option == 4:
+                user_stats(df)
+            elif option == 9:
+                break
 
 
 if __name__ == "__main__":
