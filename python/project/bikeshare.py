@@ -1,7 +1,9 @@
 from datetime import timedelta
+import sys
 import time
-import pandas as pd
+
 import numpy as np
+import pandas as pd
 
 
 CITY_DATA = {
@@ -31,12 +33,28 @@ WEEKDAYS_NAMES = [
 
 
 def get_most_commum(df):
+    """
+    Function to get the most commum value and count it occurrencies
+    Args:
+        (df) df - DataFrame filtered by the collum to count
+    Returns:
+        (str) most_common - Most commum name in the collum informed
+        (int) count - Number of occurrecies
+    """
     df_most_common = df.value_counts().to_frame()
     most_common = df_most_common.index.values[0]
     count = df_most_common.values[0][0]
     return most_common, count
 
+
 def get_route(row):
+    """
+    Function to join Start and End Station as a Route 
+    Args:
+        (pd row) row - Row of DataFrame
+    Returns:
+        (str) "FROM: [Start Station] TO: [End Station]"
+    """
     return f"FROM: {row['Start Station']} TO: {row['End Station']}"
 
 
@@ -67,18 +85,25 @@ def get_input_data(label, validation_data, enable_all=False):
         (boolean) enable_all - allow the user to type [all] for a filter
     """
     while True:
-        enable_all_error_message = ""
-        user_input = input(f"Enter the {label} name: ").lower()
-        if user_input == "exit":
-            exit()
-        if user_input in validation_data or (user_input == "all" and enable_all):
-            return user_input
-        elif enable_all:
-            enable_all_error_message = " or type 'all'"
+        try:
+            enable_all_message = " or type 'all'" if enable_all else ""
 
-        print(
-            f"Invalid {label} name '{user_input}]'. Please choose one of the following: {validation_data}{enable_all_error_message}"
-        )
+            user_input = input(
+                f"Choose a {label} ({validation_data}{enable_all_message}): "
+            ).lower()
+
+            if user_input == "exit":
+                sys.exit()
+            if user_input in validation_data or (user_input == "all" and enable_all):
+                return user_input
+
+
+            print(
+                f"Invalid {label} name '{user_input}'. "
+                f"Please choose one of the following: {validation_data}{enable_all_message}"
+            )
+        except KeyboardInterrupt:
+            sys.exit()
 
 
 def get_filters():
@@ -92,7 +117,8 @@ def get_filters():
     """
     print("Hello! Let's explore some US bikeshare data!")
     print("If you want to quit, just type 'exit' anytime")
-    # get user input for city (chicago, new york city, washington). HINT: Use a while loop to handle invalid inputs
+    # get user input for city (chicago, new york city, washington). 
+    # HINT: Use a while loop to handle invalid inputs
     city = get_input_data("city", list(CITY_DATA.keys()))
 
     # get user input for month (all, january, february, ... , june)
@@ -218,59 +244,83 @@ def user_stats(df):
     print()
     print(df_users_types.to_string())
 
-    # Display counts of gender
-    df_gender = df.groupby(['Gender'])['Gender'].count()
-    print()
-    print(df_gender.to_string())
-    empty = len(df) - sum(df_gender.values.tolist())
-    print(f"Empty:     {empty}")
+    try:
+        # Display counts of gender
+        df_gender = df.groupby(['Gender'])['Gender'].count()
+        print()
+        print(df_gender.to_string())
+        empty = len(df) - sum(df_gender.values.tolist())
+        print(f"Empty:     {empty}")
+    except KeyError:
+        # Some cities do not have gender
+        pass
 
-    # Display earliest, most recent, and most common year of birth
-    df_erliest_year = df["Birth Year"].min()
-    df_recent_year = df["Birth Year"].max()
-    df_mode_year = df["Birth Year"].mode()
+    try:
+        # Display earliest, most recent, and most common year of birth
+        df_erliest_year = int(df["Birth Year"].min())
+        df_recent_year = int(df["Birth Year"].max())
+        mode_year, _ = get_most_commum(df['Birth Year'])
 
-    print(f"\nThe most erliest year of birth: {df_erliest_year}")
-    print(f"The most recent year of birth: {df_recent_year}")
-    print(f"The most common year of birth: {df_mode_year}")
+        print(f"\nThe most erliest year of birth: {df_erliest_year}")
+        print(f"The most recent year of birth: {df_recent_year}")
+        print(f"The most common year of birth: {int(mode_year)}")
 
+    except KeyError:
+        # Some cities do not have year of birth
+        pass
+    
     print(f"\nThis took {time.time() - start_time} seconds.")
     print("-" * 40)
 
+def menu():
+    print("-" * 40)
+    print("1 - Time Stats")
+    print("2 - Station Stats")
+    print("3 - Trip Duration Stats")
+    print("4 - User Stats")
+    print("9 - Restart")
+    print("0 - Exit")
+    print("-" * 40)
+    option = get_input_data('menu', ['1', '2', '3', '4', '9', '0'])
+    
+    if option == "0":
+        sys.exit()
+
+    return option
+
 
 def main():
-    # while True:
-    i = 0
-    for k, v in CITY_DATA.items():
-        for k2, _ in MONTHS_NAMES.items():
-            for d in WEEKDAYS_NAMES:
-                start_time = time.time()
-                # city, month, day = get_filters()
-                # city, month, day = "chicago", "january", "monday"
-                city, month, day = k, k2, d
-                
-                df = load_data(city, month, day)
-                
-                try:
-                    time_stats(df)
-                    station_stats(df)
-                    trip_duration_stats(df)
-                    user_stats(df)
-                except:
-                    print("#"*50)
-                    print("Error")
-                    print(city, month, day)
-                    print("#"*50)
+    while True:
+        try:
+            city, month, day = get_filters()
+            # city, month, day = "chicago", "all", "all"
+        except KeyboardInterrupt:
+            break
 
-                print(f"\nTotal time in seconds: {time.time() - start_time}")
-                # restart = input("\nWould you like to restart? Enter yes or no.\n")
-                # if restart.lower() != "yes":
-                #     break
-                
-                i += 1
+        df = load_data(city, month, day)
+        
+        while True:
+            option = int(menu())
+
+            try:
+                if option == 1:
+                    time_stats(df)
+                elif option == 2:
+                    station_stats(df)
+                elif option == 3:
+                    trip_duration_stats(df)
+                elif option == 4:
+                    user_stats(df)
+                elif option == 9:
+                    break
+    
+            except Exception as exc:
                 print("#"*50)
-                print(i, 126)
+                print(f"Error: {exc}")
+                print(city, month, day)
                 print("#"*50)
+                raise
+
 
 if __name__ == "__main__":
     main()
