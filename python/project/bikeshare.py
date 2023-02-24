@@ -1,4 +1,6 @@
 from datetime import timedelta
+import os
+import platform
 import sys
 import time
 
@@ -31,6 +33,12 @@ WEEKDAYS_NAMES = [
     "saturday",
 ]
 
+
+def clear_terminal():
+    if platform.system() == 'Windows':
+        os.system('cls')
+    else:
+        os.system('clear')
 
 def get_most_commum(df):
     """
@@ -184,6 +192,7 @@ def time_stats(df):
 
     print(f"\nThis took {time.time() - start_time} seconds.")
     print("-" * 40)
+    print("\n\n")
 
 
 def station_stats(df):
@@ -209,6 +218,7 @@ def station_stats(df):
 
     print(f"\nThis took {time.time() - start_time} seconds.")
     print("-" * 40)
+    print("\n\n")
 
 
 def trip_duration_stats(df):
@@ -235,6 +245,7 @@ def trip_duration_stats(df):
     
     print(f"\nThis took {time.time() - start_time} seconds.")
     print("-" * 40)
+    print("\n\n")
 
 
 def user_stats(df):
@@ -275,6 +286,7 @@ def user_stats(df):
     
     print(f"\nThis took {time.time() - start_time} seconds.")
     print("-" * 40)
+    print("\n\n")
 
 def menu():
     """Displays menu to users."""
@@ -307,6 +319,7 @@ def header(city, month, day):
 
 def main():
     while True:
+        clear_terminal()
         try:
             city, month, day = get_filters()
             # city, month, day = "chicago", "all", "all"
@@ -317,7 +330,8 @@ def main():
         
         while True:
             option = int(menu())
-            
+            clear_terminal()
+
             if 1 <= option <= 4:
                 header(city, month, day)
 
