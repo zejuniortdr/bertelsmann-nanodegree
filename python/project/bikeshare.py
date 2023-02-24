@@ -15,11 +15,11 @@ CITY_DATA = {
 }
 
 MONTHS_NAMES = {
-    "january": 1, 
-    "february": 2, 
-    "march": 3, 
-    "april": 4, 
-    "may": 5, 
+    "january": 1,
+    "february": 2,
+    "march": 3,
+    "april": 4,
+    "may": 5,
     "june": 6,
 }
 
@@ -35,10 +35,12 @@ WEEKDAYS_NAMES = [
 
 
 def clear_terminal():
-    if platform.system() == 'Windows':
-        os.system('cls')
+    """Function to clear terminal and improve readability"""
+    if platform.system() != "Windows":
+        os.system("clear")
     else:
-        os.system('clear')
+        os.system("cls")
+
 
 def get_most_commum(df):
     """
@@ -57,7 +59,7 @@ def get_most_commum(df):
 
 def get_route(row):
     """
-    Function to join Start and End Station as a Route 
+    Function to join Start and End Station as a Route
     Args:
         (pd row) row - Row of DataFrame
     Returns:
@@ -105,7 +107,6 @@ def get_input_data(label, validation_data, enable_all=False):
             if user_input in validation_data or (user_input == "all" and enable_all):
                 return user_input
 
-
             print(
                 f"Invalid {label} name '{user_input}'. "
                 f"Please choose one of the following: {validation_data}{enable_all_message}"
@@ -125,7 +126,7 @@ def get_filters():
     """
     print("Hello! Let's explore some US bikeshare data!")
     print("If you want to quit, just type 'exit' anytime\n\n")
-    # get user input for city (chicago, new york city, washington). 
+    # get user input for city (chicago, new york city, washington).
     # HINT: Use a while loop to handle invalid inputs
     city = get_input_data("city", list(CITY_DATA.keys()))
 
@@ -151,24 +152,27 @@ def load_data(city, month, day):
         df - Pandas DataFrame containing city data filtered by month and day
     """
     df = pd.read_csv(CITY_DATA[city])
-    df['Start Time'] = pd.to_datetime(df['Start Time'])
+    df["Start Time"] = pd.to_datetime(df["Start Time"])
 
     # extract month and day of week from Start Time to create new columns
-    df['month'] = df['Start Time'].dt.month 
-    df['day_of_week'] = df['Start Time'].dt.day_name()
-    df['hour'] = df['Start Time'].dt.hour
-    df['route'] = df.apply(lambda row: get_route(row), axis=1)
+    df["month"] = df["Start Time"].dt.month
+    df["day_of_week"] = df["Start Time"].dt.day_name()
+    df["hour"] = df["Start Time"].dt.hour
+    df["route"] = df.apply(lambda row: get_route(row), axis=1)
 
     if month != "all":
-        df = df[df['month'] == MONTHS_NAMES[month]]
-    
-    if day != 'all':
-        df = df[df['day_of_week'] == day.title()]
+        df = df[df["month"] == MONTHS_NAMES[month]]
+
+    if day != "all":
+        df = df[df["day_of_week"] == day.title()]
 
     return df
 
+
 def format_percent(num, total):
+    """Calculate and format percent message"""
     return f"{num / total* 100:.2f}%"
+
 
 def time_stats(df):
     """Displays statistics on the most frequent times of travel."""
@@ -178,17 +182,23 @@ def time_stats(df):
     total_count = len(df)
 
     # display the most common month
-    month, count = get_most_commum(df['month'])
+    month, count = get_most_commum(df["month"])
     month = get_dict_key_name_from_value(MONTHS_NAMES, month)
-    print(f"The most common month is {month.title()}. Count: {count} ({format_percent(count, total_count)})")
+    print(
+        f"The most common month is {month.title()}. Count: {count} ({format_percent(count, total_count)})"
+    )
 
     # display the most common day of week
-    day_of_week, count = get_most_commum(df['day_of_week'])
-    print(f"The most common day of week is {day_of_week}. Count: {count} ({format_percent(count, total_count)})")
+    day_of_week, count = get_most_commum(df["day_of_week"])
+    print(
+        f"The most common day of week is {day_of_week}. Count: {count} ({format_percent(count, total_count)})"
+    )
 
     # display the most common start hour
-    hour, count = get_most_commum(df['hour'])
-    print(f"The most common start hour is {hour}. Count: {count} ({format_percent(count, total_count)})")
+    hour, count = get_most_commum(df["hour"])
+    print(
+        f"The most common start hour is {hour}. Count: {count} ({format_percent(count, total_count)})"
+    )
 
     print(f"\nThis took {time.time() - start_time} seconds.")
     print("-" * 40)
@@ -203,18 +213,23 @@ def station_stats(df):
     total_count = len(df)
 
     # display most commonly used start station
-    start_station, count = get_most_commum(df['Start Station'])
-    print(f"The most commonly used start station is {start_station}. Count: {count} ({format_percent(count, total_count)})")
+    start_station, count = get_most_commum(df["Start Station"])
+    print(
+        f"The most commonly used start station is {start_station}. Count: {count} ({format_percent(count, total_count)})"
+    )
 
     # display most commonly used end station
-    end_station, count = get_most_commum(df['End Station'])
-    print(f"The most commonly used end station is {end_station}. Count: {count} ({format_percent(count, total_count)})")
+    end_station, count = get_most_commum(df["End Station"])
+    print(
+        f"The most commonly used end station is {end_station}. Count: {count} ({format_percent(count, total_count)})"
+    )
 
     # display most frequent combination of start station and end station trip
     # TODO: most frequent combination
-    route, count = get_most_commum(df['route'])
-    print(f"The most commonly route is {route}. Count: {count} ({format_percent(count, total_count)})")
-
+    route, count = get_most_commum(df["route"])
+    print(
+        f"The most commonly route is {route}. Count: {count} ({format_percent(count, total_count)})"
+    )
 
     print(f"\nThis took {time.time() - start_time} seconds.")
     print("-" * 40)
@@ -228,21 +243,29 @@ def trip_duration_stats(df):
     start_time = time.time()
 
     # display total travel time
-    total_time_in_seconds = int(df['Trip Duration'].sum())
-    print(f"Total travel time is {total_time_in_seconds} seconds ({timedelta(seconds=total_time_in_seconds)})")
+    total_time_in_seconds = int(df["Trip Duration"].sum())
+    print(
+        f"Total travel time is {total_time_in_seconds} seconds ({timedelta(seconds=total_time_in_seconds)})"
+    )
 
     # display mean travel time
-    mean_time_in_seconds = int(df['Trip Duration'].mean())
-    print(f"Mean travel time is {mean_time_in_seconds} seconds ({timedelta(seconds=mean_time_in_seconds)})")
+    mean_time_in_seconds = int(df["Trip Duration"].mean())
+    print(
+        f"Mean travel time is {mean_time_in_seconds} seconds ({timedelta(seconds=mean_time_in_seconds)})"
+    )
 
     # display max travel time
-    max_time_in_seconds = int(df['Trip Duration'].max())
-    print(f"Max travel time is {max_time_in_seconds} seconds ({timedelta(seconds=max_time_in_seconds)})")
+    max_time_in_seconds = int(df["Trip Duration"].max())
+    print(
+        f"Max travel time is {max_time_in_seconds} seconds ({timedelta(seconds=max_time_in_seconds)})"
+    )
 
     # display min travel time
-    min_time_in_seconds = int(df['Trip Duration'].min())
-    print(f"Min travel time is {min_time_in_seconds} seconds ({timedelta(seconds=min_time_in_seconds)})")
-    
+    min_time_in_seconds = int(df["Trip Duration"].min())
+    print(
+        f"Min travel time is {min_time_in_seconds} seconds ({timedelta(seconds=min_time_in_seconds)})"
+    )
+
     print(f"\nThis took {time.time() - start_time} seconds.")
     print("-" * 40)
     print("\n\n")
@@ -255,13 +278,13 @@ def user_stats(df):
     start_time = time.time()
 
     # Display counts of user types
-    df_users_types = df.groupby(['User Type'])['User Type'].count()
+    df_users_types = df.groupby(["User Type"])["User Type"].count()
     print()
     print(df_users_types.to_string())
 
     try:
         # Display counts of gender
-        df_gender = df.groupby(['Gender'])['Gender'].count()
+        df_gender = df.groupby(["Gender"])["Gender"].count()
         print()
         print(df_gender.to_string())
         empty = len(df) - sum(df_gender.values.tolist())
@@ -274,7 +297,7 @@ def user_stats(df):
         # Display earliest, most recent, and most common year of birth
         df_erliest_year = int(df["Birth Year"].min())
         df_recent_year = int(df["Birth Year"].max())
-        mode_year, _ = get_most_commum(df['Birth Year'])
+        mode_year, _ = get_most_commum(df["Birth Year"])
 
         print(f"\nThe most erliest year of birth: {df_erliest_year}")
         print(f"The most recent year of birth: {df_recent_year}")
@@ -283,24 +306,51 @@ def user_stats(df):
     except KeyError:
         # Some cities do not have year of birth
         pass
-    
+
     print(f"\nThis took {time.time() - start_time} seconds.")
     print("-" * 40)
     print("\n\n")
 
+
+def raw_data(df):
+    start = 0
+    step_min, step_max = 1, 60
+    total_rows = len(df)
+
+    try:
+        step = int(input(f"\nHow many rows do you want to see? (min: 1, max: 60) (Default: 5) "))
+        step = max(step_min, min(step, step_max))
+    except ValueError:
+        step = 5
+
+    end = start + step
+    while True:
+        print("\n")
+        print(df.iloc[start:end, :-4])
+        print(f"Showing {step} rows ({start}:{end}) rows of {total_rows}")
+        user_input = input(f"\nDo you want to see the next {step} rows? (yes/no): ").lower()
+        if user_input != "yes":
+            break
+        start += step
+        end += step
+        
+
 def menu():
     """Displays menu to users."""
     print("-" * 40)
-    print("To analise the data, please choose a menu number, or type 9 to restart or 0 to exit")
+    print(
+        "To analise the data, please choose a menu number, or type 9 to restart or 0 to exit"
+    )
     print("1 - Time Stats")
     print("2 - Station Stats")
     print("3 - Trip Duration Stats")
     print("4 - User Stats")
+    print("5 - Raw Data")
     print("9 - Restart")
     print("0 - Exit")
     print("-" * 40)
-    option = get_input_data('menu', ['1', '2', '3', '4', '9', '0'])
-    
+    option = get_input_data("menu", ["1", "2", "3", "4", "5", "9", "0"])
+
     if option == "0":
         sys.exit()
 
@@ -310,12 +360,12 @@ def menu():
 def header(city, month, day):
     """Displays header with the chosen filters to users."""
     print("\n\n\n")
-    print("="*50)
+    print("=" * 50)
     print("Chosen Filters:")
     print(f"City: {city}")
     print(f"Month: {month}")
     print(f"Day of Week: {day}")
-    
+
 
 def main():
     while True:
@@ -327,7 +377,7 @@ def main():
             break
 
         df = load_data(city, month, day)
-        
+
         while True:
             option = int(menu())
             clear_terminal()
@@ -343,6 +393,8 @@ def main():
                 trip_duration_stats(df)
             elif option == 4:
                 user_stats(df)
+            elif option == 5:
+                raw_data(df)
             elif option == 9:
                 break
 
