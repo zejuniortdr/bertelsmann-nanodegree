@@ -4,7 +4,6 @@ import platform
 import sys
 import time
 
-import numpy as np
 import pandas as pd
 
 
@@ -91,7 +90,7 @@ def get_input_data(label, validation_data, enable_all=False):
 
     Returns:
         (str) label - label for messages to user. Examples: city, month or day
-        (list) validation_data - validation list to be compare against user input
+        (list) validation_data - list to be compare against user input
         (boolean) enable_all - allow the user to type [all] for a filter
     """
     while True:
@@ -104,12 +103,15 @@ def get_input_data(label, validation_data, enable_all=False):
 
             if user_input == "exit":
                 sys.exit()
-            if user_input in validation_data or (user_input == "all" and enable_all):
+
+            allow_all = user_input == "all" and enable_all
+            if user_input in validation_data or allow_all:
                 return user_input
 
             print(
                 f"Invalid {label} name '{user_input}'. "
-                f"Please choose one of the following: {validation_data}{enable_all_message}"
+                "Please choose one of the following: "
+                f"{validation_data}{enable_all_message}"
             )
         except KeyboardInterrupt:
             sys.exit()
@@ -121,8 +123,9 @@ def get_filters():
 
     Returns:
         (str) city - name of the city to analyze
-        (str) month - name of the month to filter by, or "all" to apply no month filter
-        (str) day - name of the day of week to filter by, or "all" to apply no day filter
+        (str) month - name of the month to filter by
+        (str) day - name of the day of week to filter by
+        "all" is a valid input to month and day
     """
     print("Hello! Let's explore some US bikeshare data!")
     print("If you want to quit, just type 'exit' anytime\n\n")
@@ -142,12 +145,14 @@ def get_filters():
 
 def load_data(city, month, day):
     """
-    Loads data for the specified city and filters by month and day if applicable.
+    Loads data for the specified city and filters by month
+    and day if applicable.
 
     Args:
         (str) city - name of the city to analyze
-        (str) month - name of the month to filter by, or "all" to apply no month filter
-        (str) day - name of the day of week to filter by, or "all" to apply no day filter
+        (str) month - name of the month to filter by
+        (str) day - name of the day of week to filter by
+        "all" is a valid input to month and day
     Returns:
         df - Pandas DataFrame containing city data filtered by month and day
     """
@@ -185,19 +190,22 @@ def time_stats(df):
     month, count = get_most_commum(df["month"])
     month = get_dict_key_name_from_value(MONTHS_NAMES, month)
     print(
-        f"The most common month is {month.title()}. Count: {count} ({format_percent(count, total_count)})"
+        f"The most common month is {month.title()}. "
+        f"Count: {count} ({format_percent(count, total_count)})"
     )
 
     # display the most common day of week
     day_of_week, count = get_most_commum(df["day_of_week"])
     print(
-        f"The most common day of week is {day_of_week}. Count: {count} ({format_percent(count, total_count)})"
+        f"The most common day of week is {day_of_week}. "
+        f"Count: {count} ({format_percent(count, total_count)})"
     )
 
     # display the most common start hour
     hour, count = get_most_commum(df["hour"])
     print(
-        f"The most common start hour is {hour}. Count: {count} ({format_percent(count, total_count)})"
+        f"The most common start hour is {hour}. "
+        f"Count: {count} ({format_percent(count, total_count)})"
     )
 
     print(f"\nThis took {time.time() - start_time} seconds.")
@@ -215,20 +223,23 @@ def station_stats(df):
     # display most commonly used start station
     start_station, count = get_most_commum(df["Start Station"])
     print(
-        f"The most commonly used start station is {start_station}. Count: {count} ({format_percent(count, total_count)})"
+        f"The most commonly used start station is {start_station}. "
+        f"Count: {count} ({format_percent(count, total_count)})"
     )
 
     # display most commonly used end station
     end_station, count = get_most_commum(df["End Station"])
     print(
-        f"The most commonly used end station is {end_station}. Count: {count} ({format_percent(count, total_count)})"
+        f"The most commonly used end station is {end_station}. "
+        f"Count: {count} ({format_percent(count, total_count)})"
     )
 
     # display most frequent combination of start station and end station trip
     # TODO: most frequent combination
     route, count = get_most_commum(df["route"])
     print(
-        f"The most commonly route is {route}. Count: {count} ({format_percent(count, total_count)})"
+        f"The most commonly route is {route}. "
+        f"Count: {count} ({format_percent(count, total_count)})"
     )
 
     print(f"\nThis took {time.time() - start_time} seconds.")
@@ -245,25 +256,29 @@ def trip_duration_stats(df):
     # display total travel time
     total_time_in_seconds = int(df["Trip Duration"].sum())
     print(
-        f"Total travel time is {total_time_in_seconds} seconds ({timedelta(seconds=total_time_in_seconds)})"
+        f"Total travel time is {total_time_in_seconds} seconds "
+        f"({timedelta(seconds=total_time_in_seconds)})"
     )
 
     # display mean travel time
     mean_time_in_seconds = int(df["Trip Duration"].mean())
     print(
-        f"Mean travel time is {mean_time_in_seconds} seconds ({timedelta(seconds=mean_time_in_seconds)})"
+        f"Mean travel time is {mean_time_in_seconds} seconds "
+        f"({timedelta(seconds=mean_time_in_seconds)})"
     )
 
     # display max travel time
     max_time_in_seconds = int(df["Trip Duration"].max())
     print(
-        f"Max travel time is {max_time_in_seconds} seconds ({timedelta(seconds=max_time_in_seconds)})"
+        f"Max travel time is {max_time_in_seconds} seconds "
+        f"({timedelta(seconds=max_time_in_seconds)})"
     )
 
     # display min travel time
     min_time_in_seconds = int(df["Trip Duration"].min())
     print(
-        f"Min travel time is {min_time_in_seconds} seconds ({timedelta(seconds=min_time_in_seconds)})"
+        f"Min travel time is {min_time_in_seconds} seconds "
+        f"({timedelta(seconds=min_time_in_seconds)})"
     )
 
     print(f"\nThis took {time.time() - start_time} seconds.")
@@ -318,7 +333,11 @@ def raw_data(df):
     total_rows = len(df)
 
     try:
-        step = int(input(f"\nHow many rows do you want to see? (min: 1, max: 60) (Default: 5) "))
+        step = int(
+            input(
+                "\nHow many rows do you want to see? " "(min: 1, max: 60) (Default: 5) "
+            )
+        )
         step = max(step_min, min(step, step_max))
     except ValueError:
         step = 5
@@ -328,18 +347,23 @@ def raw_data(df):
         print("\n")
         print(df.iloc[start:end, :-4])
         print(f"Showing {step} rows ({start}:{end}) rows of {total_rows}")
-        user_input = input(f"\nDo you want to see the next {step} rows? (yes/no): ").lower()
+        user_input = input(
+            f"\nDo you want to see the next {step} rows? (yes/no): "
+        ).lower()
+
         if user_input != "yes":
             break
+
         start += step
         end += step
-        
+
 
 def menu():
     """Displays menu to users."""
     print("-" * 40)
     print(
-        "To analise the data, please choose a menu number, or type 9 to restart or 0 to exit"
+        "To analise the data, please choose a menu number, "
+        "or type 9 to restart or 0 to exit"
     )
     print("1 - Time Stats")
     print("2 - Station Stats")
@@ -352,6 +376,7 @@ def menu():
     option = get_input_data("menu", ["1", "2", "3", "4", "5", "9", "0"])
 
     if option == "0":
+        print("Bye!")
         sys.exit()
 
     return option
@@ -372,7 +397,6 @@ def main():
         clear_terminal()
         try:
             city, month, day = get_filters()
-            # city, month, day = "chicago", "all", "all"
         except KeyboardInterrupt:
             break
 
