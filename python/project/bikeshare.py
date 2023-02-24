@@ -335,7 +335,8 @@ def raw_data(df):
     try:
         step = int(
             input(
-                "\nHow many rows do you want to see? " "(min: 1, max: 60) (Default: 5) "
+                "\nHow many rows do you want to see? "
+                "(min: 1, max: 60) (Default: 5) "
             )
         )
         step = max(step_min, min(step, step_max))
