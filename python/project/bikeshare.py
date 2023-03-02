@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import datetime, timedelta
 import os
 import platform
 import sys
@@ -39,7 +39,7 @@ def clear_terminal():
         os.system("clear")
     else:
         os.system("cls")
-
+    
 
 def get_most_commum(df):
     """
@@ -55,6 +55,25 @@ def get_most_commum(df):
     count = df_most_common.values[0][0]
     return most_common, count
 
+
+def age_range(row, step=10):
+    """
+    Function to calculate date range from customers
+    Args:
+        (pd row) row - Row of DataFrame
+    Returns:
+        (str) Date Range, for example: "0-10", "10-20", "20-30"
+    """
+    try:
+        age = datetime.now().year - int(row['Birth Year'])
+        age_range_min = (age // step) * step
+        age_range_max = age_range_min + step
+        return f"{age_range_min}-{age_range_max}"
+    except ValueError:
+        # Returns N/A for non applicable
+        return "N/A"
+    except KeyError:
+        return ""
 
 def get_route(row):
     """
@@ -164,6 +183,8 @@ def load_data(city, month, day):
     df["day_of_week"] = df["Start Time"].dt.day_name()
     df["hour"] = df["Start Time"].dt.hour
     df["route"] = df.apply(lambda row: get_route(row), axis=1)
+    if "Birth Year" in df:
+        df["age_range"] = df.apply(lambda row: age_range(row), axis=1)
 
     if month != "all":
         df = df[df["month"] == MONTHS_NAMES[month]]
@@ -300,7 +321,7 @@ def user_stats(df):
     try:
         # Display counts of gender
         df_gender = df.groupby(["Gender"])["Gender"].count()
-        print()
+        print("\n")
         print(df_gender.to_string())
         empty = len(df) - sum(df_gender.values.tolist())
         print(f"Empty {empty}")
@@ -318,14 +339,17 @@ def user_stats(df):
         print(f"The most recent year of birth: {df_recent_year}")
         print(f"The most common year of birth: {int(mode_year)}")
 
+        print("\n\nUser's date range\n")
+        df_age_range = df.groupby(["age_range"])["age_range"].count()
+        print(df_age_range.sort_values(ascending=False).to_string())
+
     except KeyError:
         # Some cities do not have year of birth
         pass
-
+    
     print(f"\nThis took {time.time() - start_time} seconds.")
     print("-" * 40)
     print("\n\n")
-
 
 def raw_data(df):
     start = 0
