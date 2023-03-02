@@ -178,7 +178,16 @@ def load_data(city, month, day):
     Returns:
         df - Pandas DataFrame containing city data filtered by month and day
     """
-    df = pd.read_csv(CITY_DATA[city])
+    try:
+        df = pd.read_csv(CITY_DATA[city])
+    except FileNotFoundError:
+        print(
+            f"Missing file [{CITY_DATA[city]}]"
+            "\nPlease place this data file in the same "
+            "folder as the bikeshare.py file and restart."
+        )
+        sys.exit()
+
     df["Start Time"] = pd.to_datetime(df["Start Time"])
 
     # extract month and day of week from Start Time to create new columns
