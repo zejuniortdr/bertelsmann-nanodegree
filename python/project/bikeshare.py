@@ -39,7 +39,7 @@ def clear_terminal():
         os.system("clear")
     else:
         os.system("cls")
-    
+
 
 def get_most_commum(df):
     """
@@ -65,7 +65,7 @@ def age_range(row, step=10):
         (str) Date Range, for example: "0-10", "10-20", "20-30"
     """
     try:
-        age = datetime.now().year - int(row['Birth Year'])
+        age = datetime.now().year - int(row["Birth Year"])
         age_range_min = (age // step) * step
         age_range_max = age_range_min + step
         return f"{age_range_min}-{age_range_max}"
@@ -74,6 +74,7 @@ def age_range(row, step=10):
         return "N/A"
     except KeyError:
         return ""
+
 
 def get_route(row):
     """
@@ -346,10 +347,11 @@ def user_stats(df):
     except KeyError:
         # Some cities do not have year of birth
         pass
-    
+
     print(f"\nThis took {time.time() - start_time} seconds.")
     print("-" * 40)
     print("\n\n")
+
 
 def raw_data(df):
     start = 0
@@ -433,7 +435,6 @@ def main():
 
             if 1 <= option <= 4:
                 header(city, month, day)
-
             if option == 1:
                 time_stats(df)
             elif option == 2:
