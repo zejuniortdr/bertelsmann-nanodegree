@@ -58,11 +58,13 @@ def get_most_commum(df):
 
 def age_range(row, step=10):
     """
-    Function to calculate date range from customers
+    Function to calculate date range from users
     Args:
         (pd row) row - Row of DataFrame
     Returns:
         (str) Date Range, for example: "0-10", "10-20", "20-30"
+        (str) "N/A" when non applicable
+        (str) "" (empty string) Some cities do not have year of birth 
     """
     try:
         age = datetime.now().year - int(row["Birth Year"])
@@ -70,7 +72,6 @@ def age_range(row, step=10):
         age_range_max = age_range_min + step
         return f"{age_range_min}-{age_range_max}"
     except ValueError:
-        # Returns N/A for non applicable
         return "N/A"
     except KeyError:
         return ""
@@ -134,6 +135,7 @@ def get_input_data(label, validation_data, enable_all=False):
                 f"{validation_data}{enable_all_message}"
             )
         except KeyboardInterrupt:
+            # Exit program when user interrupts
             sys.exit()
 
 
